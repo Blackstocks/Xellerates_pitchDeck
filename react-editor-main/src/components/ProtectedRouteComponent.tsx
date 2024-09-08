@@ -8,7 +8,7 @@ const PrivateRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => 
     useEffect(() => {
         if (!loading && !user) {
             // Redirect to an external URL (main project login page)
-            window.location.href = 'http://localhost:3000';
+            window.location.href = 'https://www.portal-xellerates.com';
         }
     }, [loading, user]);
 
