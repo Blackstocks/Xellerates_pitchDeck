@@ -24,14 +24,14 @@ function Router() {
         <Route
           path="/editor"
           element={
-            <PrivateRoute>
-              <DesignEditor />
-            </PrivateRoute>
+            // <PrivateRoute>
+            // </PrivateRoute>
+            <DesignEditor />
           }
         />
 
         {/* Public route */}
-        <Route path="/" element={<PrivateRoute> <Home /></PrivateRoute>} />
+        <Route path="/" element={<Home />} />
       </Routes>
     </BrowserRouter>
   );
