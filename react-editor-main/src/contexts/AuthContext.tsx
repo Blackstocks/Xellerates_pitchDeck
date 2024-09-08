@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../utils/supabaseClient'; // Ensure this is correctly set up
 import useSWR from 'swr';
-import jwt from 'jsonwebtoken'; // Import JWT library
 
 interface User {
   id: string;
@@ -16,31 +15,28 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// Function to fetch the user data using the JWT token
+// Function to fetch the user data using the backend API
 const fetcher = async () => {
-  // Read the token from the URL
   const urlParams = new URLSearchParams(window.location.search);
   const token = urlParams.get('token');
 
   if (!token) throw new Error('No pitchdeck token found');
 
-  // Verify and decode the JWT token to extract user information
-  let decoded: any;
-  try {
-    decoded = jwt.verify(token, import.meta.env.VITE_JWT_SECRET);
-  } catch (error) {
-    throw new Error('Invalid or expired token');
+  // Send token to backend API to verify and get user data
+  const response = await fetch('https://xellerates-pitch-deck.vercel.app/api/verify-token', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ token }),
+  });
+
+  if (!response.ok) {
+    throw new Error('Token verification failed');
   }
 
-  // Use the decoded user ID to fetch the user from Supabase
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('id', decoded.userId)
-    .single();
-
-  if (error) throw error;
-  return data;
+  const data = await response.json();
+  return data.user; // Assuming your backend returns the user data
 };
 
 const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
