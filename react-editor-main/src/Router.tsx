@@ -31,7 +31,7 @@ function Router() {
         />
 
         {/* Public route */}
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<PrivateRoute> <Home /></PrivateRoute>} />
       </Routes>
     </BrowserRouter>
   );
