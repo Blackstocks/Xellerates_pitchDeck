@@ -2,6 +2,7 @@ import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../utils/supabaseClient'; // Ensure this is correctly set up
 import useSWR from 'swr';
 import Cookies from 'js-cookie';
+import jwt from 'jsonwebtoken'; // Import JWT library
 
 interface User {
   id: string;
@@ -16,13 +17,28 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+// Function to fetch the user data using the JWT token
 const fetcher = async () => {
-  const accessToken = Cookies.get('access_token');
-  if (!accessToken) throw new Error('No access token found');
+  const token = Cookies.get('pitchdeck_token');
+  if (!token) throw new Error('No pitchdeck token found');
 
-  const { data, error } = await supabase.auth.getUser();
+  // Verify and decode the JWT token to extract user information
+  let decoded: any;
+  try {
+    decoded = jwt.verify(token, import.meta.env.VITE_JWT_SECRET);
+  } catch (error) {
+    throw new Error('Invalid or expired token');
+  }
+
+  // Use the decoded user ID to fetch the user from Supabase
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', decoded.userId)
+    .single();
+
   if (error) throw error;
-  return data.user;
+  return data;
 };
 
 const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -34,8 +50,8 @@ const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => 
   const [loading, setLoading] = useState<boolean>(!user && !error);
 
   useEffect(() => {
-    const accessToken = Cookies.get('access_token');
-    if (accessToken) {
+    const token = Cookies.get('pitchdeck_token');
+    if (token) {
       mutate();
     } else {
       mutate(undefined, false);
