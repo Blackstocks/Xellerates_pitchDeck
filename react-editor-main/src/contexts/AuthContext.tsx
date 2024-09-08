@@ -23,7 +23,7 @@ const fetcher = async () => {
   if (!token) throw new Error('No pitchdeck token found');
 
   // Send token to backend API to verify and get user data
-  const response = await fetch('https://xellerates-pitch-deck.vercel.app/api/verify-token', {
+  const response = await fetch('https://xellerates-pitch-deck.vercel.app/api/verifyToken', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
