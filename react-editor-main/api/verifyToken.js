@@ -9,7 +9,7 @@ export default async function handler(req, res) {
   // Parse the incoming request body
   let token
   try {
-    const { token: reqToken } = await req.json() // Use the Vercel body parser
+    const { token: reqToken } = req.body // Change this line to use req.body directly
     token = reqToken
   } catch (err) {
     return res.status(400).json({ error: "Invalid JSON body" })
@@ -22,7 +22,7 @@ export default async function handler(req, res) {
 
   try {
     // Verify the token using your secret key
-    const decoded = jwt.verify(token, import.meta.env.VITE_JWT_SECRET)
+    const decoded = jwt.verify(token, process.env.VITE_JWT_SECRET) // Use process.env here
 
     return res.status(200).json({ user: decoded })
   } catch (error) {
