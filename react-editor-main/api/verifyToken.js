@@ -22,6 +22,7 @@ export default async function handler(req, res) {
 
   try {
     // Verify the token using your secret key
+    console.log(process.env.VITE_JWT_SECRET)
     const decoded = jwt.verify(token, process.env.VITE_JWT_SECRET) // Use process.env here
 
     return res.status(200).json({ user: decoded })
